@@ -1,4 +1,4 @@
-module src
+module github.com/LucioBr123/goChat/GoChatServer
 
 go 1.22.3
 
@@ -9,4 +9,8 @@ require (
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
+)
+
+replace (
+	"github.com/LucioBr123/goChat/GoChatServer/tools/logger" => "./GoChatServer/db/database.go"
 )

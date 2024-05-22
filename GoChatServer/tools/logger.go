@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func validaDir() error {
+func ValidaDir() error {
 	// Verifica se o diretório "log" existe
 	if _, err := os.Stat("log"); os.IsNotExist(err) {
 		// Cria o diretório "log" se não existir
@@ -47,8 +47,8 @@ func validaDir() error {
 	return nil
 }
 
-func saveLog(errorMessage string) {
-	if err := validaDir(); err != nil {
+func SaveLog(errorMessage string) {
+	if err := ValidaDir(); err != nil {
 		fmt.Println("Erro ao validar diretórios:", err)
 		return
 	}
