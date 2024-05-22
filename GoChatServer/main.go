@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/LucioBr123/goChat/GoChatServer/logger"
+	"github.com/LucioBr123/goChat/GoChatServer/tools/logger"
 )
 
 func main() {
