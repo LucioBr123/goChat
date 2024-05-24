@@ -2,6 +2,7 @@ package logger
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -31,17 +32,17 @@ func validaDir() error {
 	return nil
 }
 
-func SaveLog(errorMessage string) {
+func SaveLog(errorMessage string) error {
 	if err := validaDir(); err != nil {
 		fmt.Println("Erro ao validar diretórios:", err)
-		return
+		return err
 	}
 
 	// Obtém a informação de onde a função foi chamada
 	_, filename, _, ok := runtime.Caller(1)
 	if !ok {
 		fmt.Println("Erro ao obter informações do caller")
-		return
+		return nil
 	}
 	packageName := filepath.Base(filepath.Dir(filename))
 
@@ -54,18 +55,21 @@ func SaveLog(errorMessage string) {
 	file, err := os.OpenFile(caminhoLog, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {
 		fmt.Println("Erro ao abrir o arquivo de log:", err)
-		return
+		return err
 	}
 	defer file.Close()
 
 	infoData := time.Now().Format("2006-01-02 15:04:05")
 
 	// Linha a ser adicionada
-	novaLinha := fmt.Sprintf("%s - %s - %s\n", infoData, errorMessage, packageName)
+	novaLinha := fmt.Sprintf("%s | %s | %s\n", infoData, errorMessage, packageName)
+	log.Println("Erro: ", errorMessage)
 
 	// Adiciona nova linha
 	if _, err := fmt.Fprint(file, novaLinha); err != nil {
 		fmt.Println("Erro ao escrever no arquivo de log:", err)
-		return
+		return err
 	}
+
+	return nil
 }

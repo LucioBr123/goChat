@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/LucioBr123/goChat/logger"
 )
 
 var DB *sql.DB
@@ -57,23 +59,23 @@ func Connect() error {
 // Executa uma atualização no banco
 func UpdateData(ctx context.Context, db *sql.DB, query string) (bool, error) {
 	if ctx == nil {
-		return false, fmt.Errorf("context can't be nil")
+		return false, logger.SaveLog("context can't be nil")
 	}
 
 	if db == nil {
-		return false, fmt.Errorf("database can't be nil")
+		return false, logger.SaveLog("database can't be nil")
 	}
 
 	// Executa a consulta de atualização de dados
 	result, err := db.ExecContext(ctx, query)
 	if err != nil {
-		return false, fmt.Errorf("error executing query: %w", err)
+		return false, logger.SaveLog(fmt.Sprintf("error executing query: %v", err))
 	}
 
 	// Obtem numero de linhas afetadas
 	affectedRows, err := result.RowsAffected()
 	if err != nil {
-		return false, fmt.Errorf("error getting affected rows: %w", err)
+		return false, logger.SaveLog(fmt.Sprintf("error getting affected rows: %v", err))
 	}
 
 	// Retorna True se afetou alguma linha
@@ -82,12 +84,12 @@ func UpdateData(ctx context.Context, db *sql.DB, query string) (bool, error) {
 
 func QryOpen(query string) (*sql.Rows, error) {
 	if DB == nil {
-		return nil, fmt.Errorf("database is not connected")
+		return nil, logger.SaveLog("database is not connected")
 	}
 
 	rows, err := DB.QueryContext(context.Background(), query)
 	if err != nil {
-		return nil, fmt.Errorf("error executing query: %w", err)
+		return nil, logger.SaveLog(fmt.Sprintf("error executing query: %v", err))
 	}
 	return rows, nil
 }
