@@ -7,8 +7,6 @@ import (
 	"os"
 	"strconv"
 	"time"
-
-	_ "github.com/microsoft/go-mssqldb"
 )
 
 var DB *sql.DB
@@ -57,17 +55,25 @@ func Connect() error {
 }
 
 // Executa uma atualização no banco
-func UpdateData(query string) (bool, error) {
-	// Atualização de dados
-	result, err := DB.ExecContext(context.Background(), query)
+func UpdateData(ctx context.Context, db *sql.DB, query string) (bool, error) {
+	if ctx == nil {
+		return false, fmt.Errorf("context can't be nil")
+	}
+
+	if db == nil {
+		return false, fmt.Errorf("database can't be nil")
+	}
+
+	// Executa a consulta de atualização de dados
+	result, err := db.ExecContext(ctx, query)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("error executing query: %w", err)
 	}
 
 	// Obtem numero de linhas afetadas
 	affectedRows, err := result.RowsAffected()
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("error getting affected rows: %w", err)
 	}
 
 	// Retorna True se afetou alguma linha
@@ -75,9 +81,13 @@ func UpdateData(query string) (bool, error) {
 }
 
 func QryOpen(query string) (*sql.Rows, error) {
+	if DB == nil {
+		return nil, fmt.Errorf("database is not connected")
+	}
+
 	rows, err := DB.QueryContext(context.Background(), query)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error executing query: %w", err)
 	}
 	return rows, nil
 }
