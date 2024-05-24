@@ -16,7 +16,6 @@ var DB *sql.DB
 // Connect cria e retorna uma conexao com o banco de dados sql server
 func Connect() error {
 	var err error
-	// TODO: Arrumar esse user espaço id que tá errado eu acho
 	DB, err := sql.Open("sqlserver", fmt.Sprintf("server=%s;user id=%s;password=%s;database=%s",
 		os.Getenv("SERVIDOR_SQL"),
 		os.Getenv("USUARIO_BANDO"),

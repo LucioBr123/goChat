@@ -1,10 +1,14 @@
 package main
 
 import (
-	"github.com/LucioBr123/goChat/logger"
+	"log"
+	"net/http"
+
+	"github.com/LucioBr123/goChat/routes"
 )
 
 func main() {
-	// Save a test log
-	logger.SaveLog("This is a test error")
+	r := routes.RegisterRoutes()
+	log.Println("Starting server on :8080")
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
