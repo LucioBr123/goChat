@@ -9,24 +9,29 @@ import (
 	"github.com/LucioBr123/goChat/models"
 )
 
-type UsuarioRepositry struct {
+type UsuarioRepository struct {
 	db *sql.DB
 }
 
-// Cria usuario
-func (repo *UsuarioRepositry) Create(usuario *models.Usuario) error {
+func NewUsuarioRepository(db *sql.DB) *UsuarioRepository {
+	return &UsuarioRepository{db: db}
+}
+
+// Cria um novo usuário no banco de dados.
+func (repo *UsuarioRepository) Create(usuario *models.Usuario) (int64, error) {
 	qry := `INSERT 
 	          INTO dbo.usuario 
-			     ( email
+	             ( email
 				 , senha
 				 , nome
 				 , cargo
 				 , fotoPath
 				 , recado
 				 , eAcessoUsuario
-				 , eStatusUsuario
-				 ) VALUES 
-				 ( ?
+				 , eStatusUsuario) 
+	        OUTPUT INSERTED.ID
+			VALUES (
+				   ?
 				 , ?
 				 , ?
 				 , ?
@@ -35,19 +40,21 @@ func (repo *UsuarioRepositry) Create(usuario *models.Usuario) error {
 				 , ?
 				 , ?)`
 
-	// Executa a qry com os valores fornecidos
-	_, err := repo.db.Exec(qry, usuario.Email, usuario.Senha, usuario.Nome, usuario.Cargo, usuario.FotoPath, usuario.Recado, usuario.EAcessoUsuario, usuario.EStatusUsuario)
+	// Executa a query com os valores fornecidos
+	var id int64
+	err := repo.db.QueryRowContext(context.Background(), qry, usuario.Email, usuario.Senha, usuario.Nome, usuario.Cargo, usuario.FotoPath, usuario.Recado, usuario.EAcessoUsuario, usuario.EStatusUsuario).Scan(&id)
 	if err != nil {
-		//Retorna erro
-		return logger.SaveLog(fmt.Sprintf("Erro ao criar usuario %s: %v", usuario.Email, err))
+		// Loga e retorna o erro
+		return 0, logger.SaveLog(fmt.Sprintf("Erro ao criar usuario %s: %v", usuario.Email, err))
 	}
 
-	//Retorna nil
-	return nil
+	// Loga sucesso
+	logger.SaveLog(fmt.Sprintf("Usuário criado com sucesso: %s", usuario.Email))
+	return id, nil
 }
 
-// Update atualiza o usuario
-func (repo *UsuarioRepositry) Update(usuario *models.Usuario) error {
+// Atualiza um usuário no banco de dados.
+func (repo *UsuarioRepository) Update(usuario *models.Usuario) error {
 	qry := `UPDATE dbo.usuario 
 	           SET email = ?
 			     , senha = ?
@@ -57,44 +64,62 @@ func (repo *UsuarioRepositry) Update(usuario *models.Usuario) error {
 				 , recado = ?
 				 , eAcessoUsuario = ?
 				 , eStatusUsuario = ?
-			 WHERE id = ?
+	         WHERE id = ? 
 			   AND delet IS NULL`
 
-	// Executa a  qry
+	// Executa a query com os valores fornecidos
 	result, err := repo.db.ExecContext(context.Background(), qry, usuario.Email, usuario.Senha, usuario.Nome, usuario.Cargo, usuario.FotoPath, usuario.Recado, usuario.EAcessoUsuario, usuario.EStatusUsuario, usuario.Id)
 	if err != nil {
-		//Retorna erro
+		// Loga e retorna o erro
 		return logger.SaveLog(fmt.Sprintf("Erro ao atualizar usuario %s: %v", usuario.Email, err))
 	}
 
-	// Verifica linhas afetadas
+	// Verifica o número de linhas afetadas
 	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		// Loga e retorna o erro
+
+		return logger.SaveLog(fmt.Sprintf("Erro ao verificar linhas afetadas ao atualizar usuario %s: %v", usuario.Email, err))
+	}
 	if rowsAffected == 0 {
-		return logger.SaveLog(fmt.Sprintf("Erro ao atualizar usuario, nenhum registro alterado %s: %v", usuario.Email, err))
+		errMsg := fmt.Sprintf("Nenhuma linha atualizada para o usuario %s", usuario.Email)
+		return logger.SaveLog(errMsg)
 	}
 
-	//Retorna nil
+	// Loga sucesso
+	logger.SaveLog(fmt.Sprintf("Usuário atualizado com sucesso: %s", usuario.Email))
 	return nil
 }
 
-func (repo *UsuarioRepositry) Delete(usuario *models.Usuario) error {
+// Deleta um usuário (soft delete) no banco de dados.
+func (repo *UsuarioRepository) Delete(usuarioID int) error {
 	qry := `UPDATE dbo.usuario 
 	           SET delet = GETDATE()
-			 WHERE id = ?
+	         WHERE id = ? 
 			   AND delet IS NULL`
 
-	// Executa a  qry
-	result, err := repo.db.ExecContext(context.Background(), qry, usuario.Email, usuario.Senha, usuario.Nome, usuario.Cargo, usuario.FotoPath, usuario.Recado, usuario.EAcessoUsuario, usuario.EStatusUsuario, usuario.Id)
+	// Executa a query com os valores fornecidos
+	result, err := repo.db.ExecContext(context.Background(), qry, usuarioID)
 	if err != nil {
-		//Retorna erro
-		return logger.SaveLog(fmt.Sprintf("Erro ao atualizar usuario %s: %v", usuario.Email, err))
+		// Loga e retorna o erro
+		logger.SaveLog(fmt.Sprintf("Erro ao deletar usuario %d: %v", usuarioID, err))
+		return fmt.Errorf("erro ao deletar usuario %d: %w", usuarioID, err)
 	}
 
+	// Verifica o número de linhas afetadas
 	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		// Loga e retorna o erro
+		logger.SaveLog(fmt.Sprintf("Erro ao verificar linhas afetadas ao deletar usuario %d: %v", usuarioID, err))
+		return fmt.Errorf("erro ao verificar linhas afetadas ao deletar usuario %d: %w", usuarioID, err)
+	}
 	if rowsAffected == 0 {
-		return logger.SaveLog(fmt.Sprintf("Erro ao atualizar usuario, nenhum registro alterado %s: %v", usuario.Email, err))
+		errMsg := fmt.Sprintf("Nenhuma linha deletada para o usuario %d", usuarioID)
+		logger.SaveLog(errMsg)
+		return fmt.Errorf(errMsg)
 	}
 
-	//Retorna nil
+	// Loga sucesso
+	logger.SaveLog(fmt.Sprintf("Usuário deletado com sucesso: %d", usuarioID))
 	return nil
 }
