@@ -36,7 +36,7 @@ func SaveLog(errorMessage string) error {
 	if err := validaDir(); err != nil {
 		fmt.Println("Erro ao validar diretórios:", err)
 		return err
-	}
+	} //TODO; Verificar motivo de estar duplicando arquivo de referencia de dia
 
 	// Obtém a informação de onde a função foi chamada
 	_, filename, _, ok := runtime.Caller(1)
