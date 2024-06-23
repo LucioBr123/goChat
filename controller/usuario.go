@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"context"
+
 	"github.com/LucioBr123/goChat/db"
 	"github.com/LucioBr123/goChat/logger"
 	"github.com/LucioBr123/goChat/models"
@@ -51,10 +53,10 @@ func CadastrarUsuario(usuario *models.Usuario) error {
 
 	usuario.Senha = senhaCriptografada
 
-	// Armazena usuario no banco de dados
+	// Cria Repositorio para operacoes com usuario
 	usuarioRepo := repository.NewUsuarioRepository(db.GetDB())
 
-	id, err := usuarioRepo.Create(usuario)
+	id, err := usuarioRepo.Create(context.Background(), usuario)
 	if err != nil {
 		return logger.SaveLog("Erro ao criar usuario: " + err.Error())
 	}

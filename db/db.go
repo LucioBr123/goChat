@@ -63,7 +63,7 @@ func initDB() error {
 }
 
 // GetDB returns the database connection.
-func GetDB() (*sql.DB, error) {
-	err := initDB()
-	return db, err
+func GetDB() *sql.DB {
+	_ = initDB()
+	return db
 }
