@@ -5,21 +5,25 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
+
+	"github.com/joho/godotenv"
 
 	"github.com/LucioBr123/goChat/logger"
 	"github.com/LucioBr123/goChat/routes"
 )
 
 func main() {
-	r := routes.RegisterRoutes()
-	portStr := os.Getenv("PORTA_SERVIDOR")
-	port, err := strconv.Atoi(portStr)
+	// Carrega as variáveis de ambiente do arquivo .env
+	err := godotenv.Load()
 	if err != nil {
-		logger.SaveLog(fmt.Sprintf("Error converting port to integer: %v", err))
+		logger.SaveLog("Error loading .env file")
 	}
-	log.Printf("Starting server on :%d", port)
-	// TODO: Verificar motivo de não conseguir obter a variavel env
+
+	r := routes.RegisterRoutes()
+	port := os.Getenv("PORTA_SERVIDOR")
+	log.Printf("Starting server on :%s", port)
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORTA_SERVIDOR")), r))
+
+	log.Printf("Starting server on :%s", port)
 }

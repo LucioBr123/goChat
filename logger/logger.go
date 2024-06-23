@@ -36,7 +36,7 @@ func SaveLog(errorMessage string) error {
 	if err := validaDir(); err != nil {
 		fmt.Println("Erro ao validar diretórios:", err)
 		return err
-	} //TODO; Verificar motivo de estar duplicando arquivo de referencia de dia
+	}
 
 	// Obtém a informação de onde a função foi chamada
 	_, filename, _, ok := runtime.Caller(1)
@@ -50,7 +50,7 @@ func SaveLog(errorMessage string) error {
 	ano := time.Now().Year()
 	mes := int(time.Now().Month())
 	dia := time.Now().Day()
-	caminhoLog := fmt.Sprintf("log/%d/%02d/dia-%02d.txt", ano, mes, dia)
+	caminhoLog := fmt.Sprintf("log/%d/%02d/%02d.txt", ano, mes, dia)
 
 	file, err := os.OpenFile(caminhoLog, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {

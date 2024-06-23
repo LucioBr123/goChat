@@ -1,7 +1,6 @@
 package enum
 
 type status_msg int
-type status_usuario int
 
 const (
 	Enviado status_msg = iota + 1
@@ -11,6 +10,8 @@ const (
 	Erro
 )
 
+type status_usuario int
+
 const (
 	Disponivel status_usuario = iota + 1
 	Ocupado
@@ -18,6 +19,18 @@ const (
 	Offline
 )
 
-// eTipoConexao
+type eTipoConexao int
 
-// eAcessoUsuario
+const (
+	Privado eTipoConexao = iota + 1
+	Grupo
+	Feed
+)
+
+type eAcessoUsuario int
+
+const (
+	Comum eAcessoUsuario = iota + 1
+	Admin
+	Ti
+)
