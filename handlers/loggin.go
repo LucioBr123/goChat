@@ -9,5 +9,5 @@ import (
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Write([]byte("Aqui é o login"))
-	logger.SaveLog("teste aqui e o login")
+	logger.LogError("teste aqui e o login")
 }

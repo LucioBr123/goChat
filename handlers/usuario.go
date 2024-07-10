@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/LucioBr123/goChat/controller"
-	"github.com/LucioBr123/goChat/logger"
 	"github.com/LucioBr123/goChat/models"
 )
 
@@ -15,13 +14,13 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Verifica se é um Post
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		logger.SaveLog("Requisição inválida, Não é POST")
+		json.NewEncoder(w).Encode(map[string]string{"error": "Requisição inválida, Não é POST"})
 	}
 
 	// Verifica se o body não tá vazio
 	if r.Body == nil {
 		w.WriteHeader(http.StatusBadRequest)
-		logger.SaveLog("Body vazio")
+		json.NewEncoder(w).Encode(map[string]string{"error": "Body vazio"})
 	}
 	defer r.Body.Close()
 
@@ -32,7 +31,7 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&usuario)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		logger.SaveLog("Erro ao decodificar JSON: " + err.Error())
+		json.NewEncoder(w).Encode(map[string]string{"error": "Erro ao decodificar JSON: " + err.Error()})
 		return
 	}
 
@@ -40,11 +39,15 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	err = controller.CadastrarUsuario(&usuario)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		logger.SaveLog("Erro ao cadastrar usuario: " + err.Error())
+		json.NewEncoder(w).Encode(map[string]string{"error": "Erro ao cadastrar usuario: " + err.Error()})
 		return
 	}
 
+	response := map[string]interface{}{
+		"id":  usuario.Id,
+		"msg": "Usuário criado com sucesso",
+	}
 	// Cria resposta
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(usuario)
+	json.NewEncoder(w).Encode(response)
 }

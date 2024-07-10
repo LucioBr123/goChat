@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -32,7 +33,7 @@ func validaDir() error {
 	return nil
 }
 
-func SaveLog(errorMessage string, params ...bool) error {
+func LogError(errorMessage string) error {
 	if err := validaDir(); err != nil {
 		fmt.Println("Erro ao validar diretórios:", err)
 		return err
@@ -61,17 +62,9 @@ func SaveLog(errorMessage string, params ...bool) error {
 
 	infoData := time.Now().Format("2006-01-02 15:04:05")
 
-	logType := "Info"
-	// Verifica tipo de log
-	if len(params) > 0 {
-		if !params[0] {
-			logType = "Info"
-		}
-	}
-
 	// Linha a ser adicionada
 	novaLinha := fmt.Sprintf("%s | %s | %s\n", infoData, errorMessage, packageName)
-	log.Println(logType, errorMessage)
+	log.Println("Erro:", errorMessage)
 
 	// Adiciona nova linha
 	if _, err := fmt.Fprint(file, novaLinha); err != nil {
@@ -79,5 +72,5 @@ func SaveLog(errorMessage string, params ...bool) error {
 		return err
 	}
 
-	return nil
+	return errors.New(errorMessage)
 }

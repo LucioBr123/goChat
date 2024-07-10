@@ -49,13 +49,13 @@ func initDB() error {
 		dsn := buildDSN(config)
 		db, err = sql.Open("sqlserver", dsn)
 		if err != nil {
-			logger.SaveLog(fmt.Sprintf("Erro ao conectar no banco de dados: %v", err))
+			logger.LogError(fmt.Sprintf("Erro ao conectar no banco de dados: %v", err))
 			return
 		}
 
 		// Verifica a conexão
 		if err = db.Ping(); err != nil {
-			logger.SaveLog(fmt.Sprintf("Erro ao verificar a conexão com o banco de dados: %v", err))
+			logger.LogError(fmt.Sprintf("Erro ao verificar a conexão com o banco de dados: %v", err))
 		}
 	})
 

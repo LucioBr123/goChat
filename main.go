@@ -16,7 +16,7 @@ func main() {
 	// Carrega as variáveis de ambiente do arquivo .env
 	err := godotenv.Load()
 	if err != nil {
-		logger.SaveLog("Error loading .env file")
+		logger.LogError("Error loading .env file")
 	}
 
 	r := routes.RegisterRoutes()
