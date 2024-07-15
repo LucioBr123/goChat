@@ -92,7 +92,7 @@ func (repo *UsuarioRepository) Update(ctx context.Context, usuario *models.Usuar
 }
 
 // Delete realiza um soft delete em um usuário no banco de dados.
-func (repo *UsuarioRepository) Delete(ctx context.Context, usuarioID int) error {
+func (repo *UsuarioRepository) Desativa(ctx context.Context, usuarioID int) error {
 	qry := `UPDATE dbo.usuario 
 	          SET delet = GETDATE() 
 	        WHERE id = @p1 
